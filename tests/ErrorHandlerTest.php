@@ -4,16 +4,20 @@ namespace Carsguide\Tests;
 
 use Carsguide\Error\ErrorHandler;
 use Carsguide\Error\Exceptions\FailedJobException;
-use Carsguide\Error\Exceptions\SendGridException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
+use Mockery;
 use Carsguide\Tests\TestCase;
 
 class ErrorHandlerTest extends TestCase
 {
     public function setUp()
     {
+        $this->handler = new ErrorHandler();
+
         parent::setUp();
     }
 
@@ -21,25 +25,55 @@ class ErrorHandlerTest extends TestCase
      * @test
      * @group ErrorHandler
      */
-    public function reportShouldLogSendGridException()
+    public function shouldRenderJsonResponseForValidationException()
     {
-        $this->handler = new ErrorHandler();
+        $mock = Mockery::mock(ValidationException::class)->makePartial();
 
-        Log::shouldReceive('info')->atLeast();
+        $mock->response = response()->json([
+            'errorMsg' => 'validation fails',
+        ], '422');
 
-        $this->handler->report(new SendGridException('sendgrid exceptions', 400, ''));
+        $response = $this->handler->render(new Request(), $mock);
+
+        $this->assertEquals('422', $response->getStatusCode());
     }
 
     /**
      * @test
      * @group ErrorHandler
      */
-    public function shouldrRenderResponseForSendGridException()
+    public function shouldRenderJsonResponseForModelNotFoundException()
     {
-        $this->handler = new ErrorHandler();
+        $mock = Mockery::mock(ModelNotFoundException::class)->makePartial();
 
-        $response = $this->handler->render(new Request(), new SendGridException('sendgrid exceptions', 400, 'body'));
+        $response = $this->handler->render(new Request(), $mock);
 
-        $this->assertEquals(SendGridException::RESPONSE_STATUS_CODE, $response->getStatusCode());
+        $this->assertEquals('404', $response->getStatusCode());
+    }
+
+    /**
+     * @test
+     * @group ErrorHandler
+     */
+    public function shouldRenderJsonResponseForFailedJobExceptionWithAppDebugFalse()
+    {
+        putenv('APP_DEBUG=' . false);
+
+        $response = $this->handler->render(new Request(), new FailedJobException('failed job', 400));
+
+        $this->assertEquals('500', $response->getStatusCode());
+    }
+
+    /**
+     * @test
+     * @group ErrorHandler
+     */
+    public function shouldRenderJsonResponseForFailedJobExceptionWithAppDebugTrue()
+    {
+        putenv('APP_DEBUG=' . true);
+
+        $response = $this->handler->render(new Request(), new FailedJobException('failed job', 400));
+
+        $this->assertEquals('400', $response->getStatusCode());
     }
 }

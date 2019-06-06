@@ -3,7 +3,6 @@
 namespace Carsguide\Error;
 
 use Carsguide\Error\Exceptions\FailedJobException;
-use Carsguide\Error\Exceptions\SendGridException;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -18,6 +17,13 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class ErrorHandler extends ExceptionHandler
 {
     /**
+     * A list of the custom exception types that should not be reported.
+     *
+     * @var array
+     */
+    protected $customDontReport = [];
+
+    /**
      * A list of the exception types that should not be reported.
      *
      * @var array
@@ -29,8 +35,17 @@ class ErrorHandler extends ExceptionHandler
         ModelNotFoundException::class,
         ValidationException::class,
         FailedJobException::class,
-        SendGridException::class,
     ];
+
+    /**
+     * Create a new exception instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->dontReport = array_merge($this->dontReport, $this->customDontReport);
+    }
 
     /**
      * Report or log an exception.
@@ -45,20 +60,9 @@ class ErrorHandler extends ExceptionHandler
         parent::report($e);
 
         if ($e instanceof ValidationException) {
-            Log::info('Validation of request failed', [
+            Log::error('Validation of request failed', [
                 'errorFieldKeys' => implode(array_keys($e->response->original), ','),
                 'requestUri' => app(Request::class)->getRequestUri(),
-            ]);
-
-            return;
-        }
-
-        if ($e instanceof SendGridException) {
-            Log::info('SendGrid api call failed', [
-                'statusCode' => $e->getSendGridResponseStatusCode(),
-                'body' => $e->getSendGridResponseBody(),
-                'errorMsg' => $e->getMessage(),
-                'stackTrace' => $e->getTrace()
             ]);
         }
     }
@@ -76,12 +80,18 @@ class ErrorHandler extends ExceptionHandler
             return parent::render($request, $e);
         }
 
-        if ($e instanceof SendGridException) {
-            return $e->getResponse();
+        if ($e instanceof ModelNotFoundException) {
+            return response()->json([
+                'errorMsg' => 'Resource could not be found',
+                'originalErrorMsg' => $e->getMessage(),
+            ], 404);
         }
 
         if (env('APP_DEBUG', false)) {
-            return parent::render($request, $e);
+            return response()->json([
+                'errorMsg' => $e->getMessage(),
+                'stackTrace' => $e->getTrace()
+            ], $e->getCode());
         }
 
         if (!$e instanceof FlattenException) {
@@ -96,6 +106,8 @@ class ErrorHandler extends ExceptionHandler
                 $msg = 'Whoops, looks like something went wrong.';
         }
 
-        return response()->json(['errorMsg' => $msg], $e->getStatusCode());
+        return response()->json([
+            'errorMsg' => $msg,
+        ], $e->getStatusCode());
     }
 }

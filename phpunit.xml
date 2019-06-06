@@ -10,7 +10,7 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="Auth manager test suite">
+        <testsuite name="Error handler test suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
