@@ -2,8 +2,8 @@
 
 namespace Carsguide\Tests;
 
-use Carsguide\Error\ErrorHandler;
-use Carsguide\Error\Exceptions\FailedJobException;
+use Carsguide\Exceptions\ExceptionHandler;
+use Carsguide\Exceptions\FailedJobException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -12,18 +12,18 @@ use Exception;
 use Mockery;
 use Carsguide\Tests\TestCase;
 
-class ErrorHandlerTest extends TestCase
+class ExceptionHandlerTest extends TestCase
 {
     public function setUp()
     {
-        $this->handler = new ErrorHandler();
+        $this->handler = new ExceptionHandler();
 
         parent::setUp();
     }
 
     /**
      * @test
-     * @group ErrorHandler
+     * @group ExceptionHandler
      */
     public function shouldRenderJsonResponseForValidationException()
     {
@@ -40,7 +40,7 @@ class ErrorHandlerTest extends TestCase
 
     /**
      * @test
-     * @group ErrorHandler
+     * @group ExceptionHandler
      */
     public function shouldRenderJsonResponseForModelNotFoundException()
     {
@@ -53,7 +53,7 @@ class ErrorHandlerTest extends TestCase
 
     /**
      * @test
-     * @group ErrorHandler
+     * @group ExceptionHandler
      */
     public function shouldRenderJsonResponseForFailedJobExceptionWithAppDebugFalse()
     {
@@ -66,7 +66,7 @@ class ErrorHandlerTest extends TestCase
 
     /**
      * @test
-     * @group ErrorHandler
+     * @group ExceptionHandler
      */
     public function shouldRenderJsonResponseForFailedJobExceptionWithAppDebugTrue()
     {

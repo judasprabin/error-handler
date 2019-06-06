@@ -1,6 +1,6 @@
 <?php
 
-namespace Carsguide\Error\Exceptions;
+namespace Carsguide\Exceptions;
 
 use Exception;
 

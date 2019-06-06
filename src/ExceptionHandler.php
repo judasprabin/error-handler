@@ -1,8 +1,8 @@
 <?php
 
-namespace Carsguide\Error;
+namespace Carsguide\Exceptions;
 
-use Carsguide\Error\Exceptions\FailedJobException;
+use Carsguide\Exceptions\FailedJobException;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -10,11 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Queue\MaxAttemptsExceededException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use Laravel\Lumen\Exceptions\Handler as ExceptionHandler;
+use Laravel\Lumen\Exceptions\Handler as BaseExceptionHandler;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class ErrorHandler extends ExceptionHandler
+class ExceptionHandler extends BaseExceptionHandler
 {
     /**
      * A list of the custom exception types that should not be reported.

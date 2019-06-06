@@ -28,7 +28,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Carsguide\\Error\\" : "src/"
+            "Carsguide\\Exceptions\\" : "src/"
         }
     },
     "autoload-dev": {
