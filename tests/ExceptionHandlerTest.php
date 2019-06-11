@@ -14,7 +14,7 @@ use Carsguide\Tests\TestCase;
 
 class ExceptionHandlerTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         $this->handler = new ExceptionHandler();
 
