@@ -42,11 +42,36 @@ class ExceptionHandlerTest extends TestCase
      * @test
      * @group ExceptionHandler
      */
-    public function shouldRenderJsonResponseForModelNotFoundException()
+    public function shouldRenderJsonResponseForModelNotFoundExceptionWithAppDebugTrue()
     {
+        putenv('APP_DEBUG=' . true);
+
         $mock = Mockery::mock(ModelNotFoundException::class)->makePartial();
 
         $response = $this->handler->render(new Request(), $mock);
+
+        $body = json_decode($response->getContent(), true);
+
+        $this->assertArrayHasKey('originalErrorMsg', $body);
+
+        $this->assertEquals('404', $response->getStatusCode());
+    }
+
+    /**
+     * @test
+     * @group ExceptionHandler
+     */
+    public function shouldRenderJsonResponseForModelNotFoundExceptionWithAppDebugFalse()
+    {
+        putenv('APP_DEBUG=' . false);
+
+        $mock = Mockery::mock(ModelNotFoundException::class)->makePartial();
+
+        $response = $this->handler->render(new Request(), $mock);
+
+        $body = json_decode($response->getContent(), true);
+
+        $this->assertArrayNotHasKey('originalErrorMsg', $body);
 
         $this->assertEquals('404', $response->getStatusCode());
     }

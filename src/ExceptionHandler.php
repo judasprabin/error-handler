@@ -81,9 +81,14 @@ class ExceptionHandler extends BaseExceptionHandler
         }
 
         if ($e instanceof ModelNotFoundException) {
+            if (env('APP_DEBUG', false)) {
+                return response()->json([
+                    'errorMsg' => 'Resource could not be found',
+                    'originalErrorMsg' => $e->getMessage(),
+                ], 404);
+            }
             return response()->json([
                 'errorMsg' => 'Resource could not be found',
-                'originalErrorMsg' => $e->getMessage(),
             ], 404);
         }
 
