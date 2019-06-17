@@ -92,21 +92,26 @@ class ExceptionHandler extends BaseExceptionHandler
             ], 404);
         }
 
+        if (!$e instanceof FlattenException) {
+            $e = FlattenException::create($e);
+        }
+
         if (env('APP_DEBUG', false)) {
             return response()->json([
                 'errorMsg' => $e->getMessage(),
                 'stackTrace' => $e->getTrace()
-            ], $e->getCode());
-        }
-
-        if (!$e instanceof FlattenException) {
-            $e = FlattenException::create($e);
+            ], $e->getStatusCode());
         }
 
         switch ($e->getStatusCode()) {
             case 404:
                 $msg = 'Sorry, the page you are looking for could not be found.';
                 break;
+
+            case 405:
+                $msg = 'Sorry, this route does not exist.';
+                break;
+
             default:
                 $msg = 'Whoops, looks like something went wrong.';
         }

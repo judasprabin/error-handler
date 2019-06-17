@@ -84,7 +84,7 @@ class ExceptionHandlerTest extends TestCase
     {
         putenv('APP_DEBUG=' . false);
 
-        $response = $this->handler->render(new Request(), new FailedJobException('failed job', 400));
+        $response = $this->handler->render(new Request(), new FailedJobException('failed job', 0));
 
         $this->assertEquals('500', $response->getStatusCode());
     }
@@ -97,8 +97,8 @@ class ExceptionHandlerTest extends TestCase
     {
         putenv('APP_DEBUG=' . true);
 
-        $response = $this->handler->render(new Request(), new FailedJobException('failed job', 400));
+        $response = $this->handler->render(new Request(), new FailedJobException('failed job', 0));
 
-        $this->assertEquals('400', $response->getStatusCode());
+        $this->assertEquals('500', $response->getStatusCode());
     }
 }
