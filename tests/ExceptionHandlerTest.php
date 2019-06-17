@@ -86,6 +86,10 @@ class ExceptionHandlerTest extends TestCase
 
         $response = $this->handler->render(new Request(), new FailedJobException('failed job', 0));
 
+        $body = json_decode($response->getContent(), true);
+
+        $this->assertArrayNotHasKey('stackTrace', $body);
+
         $this->assertEquals('500', $response->getStatusCode());
     }
 
@@ -98,6 +102,10 @@ class ExceptionHandlerTest extends TestCase
         putenv('APP_DEBUG=' . true);
 
         $response = $this->handler->render(new Request(), new FailedJobException('failed job', 0));
+
+        $body = json_decode($response->getContent(), true);
+
+        $this->assertArrayHasKey('stackTrace', $body);
 
         $this->assertEquals('500', $response->getStatusCode());
     }
