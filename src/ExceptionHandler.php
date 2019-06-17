@@ -105,11 +105,8 @@ class ExceptionHandler extends BaseExceptionHandler
 
         switch ($e->getStatusCode()) {
             case 404:
-                $msg = 'Sorry, the page you are looking for could not be found.';
-                break;
-
             case 405:
-                $msg = 'Sorry, this route does not exist.';
+                $msg = 'Sorry, the page you are looking for could not be found.';
                 break;
 
             default:
