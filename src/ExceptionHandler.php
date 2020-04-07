@@ -2,8 +2,6 @@
 
 namespace Carsguide\Exceptions;
 
-use Exception;
-use Throwable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -13,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Lumen\Exceptions\Handler as BaseExceptionHandler;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
 
 class ExceptionHandler extends BaseExceptionHandler
 {
@@ -70,11 +69,11 @@ class ExceptionHandler extends BaseExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Exception $e
+     * @param \Illuminate\Http\Request $request
+     * @param Throwable $e
      * @return \Illuminate\Http\JsonResponse
      */
-    public function render($request, Exception $e)
+    public function render($request, Throwable $e)
     {
         if ($e instanceof ValidationException) {
             return parent::render($request, $e);
