@@ -92,7 +92,7 @@ class ExceptionHandler extends BaseExceptionHandler
         }
 
         if (!$e instanceof FlattenException) {
-            $e = FlattenException::create($e);
+            $e = FlattenException::createFromThrowable($e);
         }
 
         if (env('APP_DEBUG', false)) {
