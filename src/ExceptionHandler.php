@@ -62,6 +62,7 @@ class ExceptionHandler extends BaseExceptionHandler
             Log::error('Validation of request failed', [
                 'errorFieldKeys' => implode(',', array_keys($e->response->original)),
                 'requestUri' => app(Request::class)->getRequestUri(),
+                'requestContent' => app(Request::class)->toArray(),
             ]);
         }
     }
