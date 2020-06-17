@@ -110,6 +110,13 @@ class ExceptionHandler extends BaseExceptionHandler
                 $msg = 'Sorry, the page you are looking for could not be found.';
                 break;
 
+            case 500:
+                if (extension_loaded('newrelic')) {
+                    newrelic_notice_error($e);
+                }
+                $msg = 'Whoops, looks like something went wrong.';
+                break;
+
             default:
                 $msg = 'Whoops, looks like something went wrong.';
         }
