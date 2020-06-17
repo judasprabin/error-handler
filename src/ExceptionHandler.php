@@ -93,6 +93,7 @@ class ExceptionHandler extends BaseExceptionHandler
             ], 404);
         }
 
+        $throwable_exception = $e;
         if (!$e instanceof FlattenException) {
             $e = FlattenException::createFromThrowable($e);
         }
@@ -108,6 +109,13 @@ class ExceptionHandler extends BaseExceptionHandler
             case 404:
             case 405:
                 $msg = 'Sorry, the page you are looking for could not be found.';
+                break;
+
+            case 500:
+                if (extension_loaded('newrelic')) {
+                    newrelic_notice_error($throwable_exception);
+                }
+                $msg = 'Whoops, looks like something went wrong.';
                 break;
 
             default:
