@@ -98,20 +98,21 @@ class ExceptionHandler extends BaseExceptionHandler
             $e = FlattenException::createFromThrowable($e);
         }
 
+        $status_code = $e->getStatusCode();
         if (env('APP_DEBUG', false)) {
             return response()->json([
                 'errorMsg' => $e->getMessage(),
                 'stackTrace' => $e->getTrace()
-            ], $e->getStatusCode());
+            ], $status_code);
         }
 
-        switch ($e->getStatusCode()) {
+        switch ($status_code) {
             case 404:
             case 405:
                 $msg = 'Sorry, the page you are looking for could not be found.';
                 break;
 
-            case 500:
+            case $status_code >= 500 && $status_code <= 599:
                 if (extension_loaded('newrelic')) {
                     newrelic_notice_error($throwable_exception);
                 }
@@ -124,6 +125,6 @@ class ExceptionHandler extends BaseExceptionHandler
 
         return response()->json([
             'errorMsg' => $msg,
-        ], $e->getStatusCode());
+        ], $status_code);
     }
 }
