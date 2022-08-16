@@ -1,5 +1,5 @@
 # error-handler
-Manages Error handler integratation in micro services.
+Manages Error handler integration in microservices using the Laravel framework.
 
 ## Installation
 Via composer

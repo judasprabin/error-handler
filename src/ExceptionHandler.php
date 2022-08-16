@@ -3,12 +3,13 @@
 namespace Carsguide\Exceptions;
 
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Queue\MaxAttemptsExceededException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use Laravel\Lumen\Exceptions\Handler as BaseExceptionHandler;
+use Illuminate\Foundation\Exceptions\Handler as BaseExceptionHandler;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
@@ -23,9 +24,9 @@ class ExceptionHandler extends BaseExceptionHandler
     protected $customDontReport = [];
 
     /**
-     * A list of the exception types that should not be reported.
+     * A list of the exception types that are not reported.
      *
-     * @var array
+     * @var array<int, class-string<\Throwable>>
      */
     protected $dontReport = [
         AuthorizationException::class,
@@ -37,13 +38,16 @@ class ExceptionHandler extends BaseExceptionHandler
     ];
 
     /**
-     * Create a new exception instance.
+     * Create a new exception handler instance.
      *
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    public function __construct()
+    public function __construct(Container $container)
     {
-        $this->dontReport = array_merge($this->dontReport, $this->customDontReport);
+        $this->container = $container;
+
+        $this->register();
     }
 
     /**
@@ -53,6 +57,8 @@ class ExceptionHandler extends BaseExceptionHandler
      *
      * @param Throwable $e
      * @return void
+     *
+     * @throws Throwable
      */
     public function report(Throwable $e)
     {
@@ -60,7 +66,7 @@ class ExceptionHandler extends BaseExceptionHandler
 
         if ($e instanceof ValidationException) {
             Log::error('Validation of request failed', [
-                'errorFieldKeys' => implode(',', array_keys($e->response->original)),
+                'errorFieldKeys' => implode(',', array_keys($e->errors())),
                 'requestUri' => app(Request::class)->getRequestUri(),
                 'requestHttpReferer' => app(Request::class)->headers->get('referer'),
                 'requestContent' => app(Request::class)->toArray(),
@@ -77,6 +83,7 @@ class ExceptionHandler extends BaseExceptionHandler
      */
     public function render($request, Throwable $e)
     {
+
         if ($e instanceof ValidationException) {
             return parent::render($request, $e);
         }

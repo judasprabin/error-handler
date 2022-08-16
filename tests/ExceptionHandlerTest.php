@@ -4,11 +4,10 @@ namespace Carsguide\Tests;
 
 use Carsguide\Exceptions\ExceptionHandler;
 use Carsguide\Exceptions\FailedJobException;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Exception;
 use Mockery;
 use Carsguide\Tests\TestCase;
 
@@ -16,7 +15,8 @@ class ExceptionHandlerTest extends TestCase
 {
     public function setUp(): void
     {
-        $this->handler = new ExceptionHandler();
+        $container = Mockery::mock(Container::class);
+        $this->handler = new ExceptionHandler($container);
 
         parent::setUp();
     }
