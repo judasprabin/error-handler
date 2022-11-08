@@ -6,10 +6,10 @@ use Carsguide\Exceptions\ExceptionHandler;
 use Carsguide\Exceptions\FailedJobException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Mockery;
-use Carsguide\Tests\TestCase;
 
 class ExceptionHandlerTest extends TestCase
 {
@@ -29,7 +29,7 @@ class ExceptionHandlerTest extends TestCase
     {
         $mock = Mockery::mock(ValidationException::class)->makePartial();
 
-        $mock->response = response()->json([
+        $mock->response = new Response([
             'errorMsg' => 'validation fails',
         ], '422');
 

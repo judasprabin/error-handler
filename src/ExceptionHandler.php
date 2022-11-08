@@ -6,6 +6,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Queue\MaxAttemptsExceededException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -79,7 +80,7 @@ class ExceptionHandler extends BaseExceptionHandler
      *
      * @param \Illuminate\Http\Request $request
      * @param Throwable $e
-     * @return \Illuminate\Http\JsonResponse
+     * @return Response
      */
     public function render($request, Throwable $e)
     {
@@ -90,12 +91,12 @@ class ExceptionHandler extends BaseExceptionHandler
 
         if ($e instanceof ModelNotFoundException) {
             if (env('APP_DEBUG', false)) {
-                return response()->json([
+                return new Response([
                     'errorMsg' => 'Resource could not be found',
                     'originalErrorMsg' => $e->getMessage(),
                 ], 404);
             }
-            return response()->json([
+            return new Response([
                 'errorMsg' => 'Resource could not be found',
             ], 404);
         }
@@ -107,10 +108,10 @@ class ExceptionHandler extends BaseExceptionHandler
 
         $status_code = $e->getStatusCode();
         if (env('APP_DEBUG', false)) {
-            return response()->json([
+            return new Response([
                 'errorMsg' => $e->getMessage(),
                 'stackTrace' => $e->getTrace()
-            ], $status_code);
+            ],$status_code);
         }
 
         switch ($status_code) {
@@ -130,7 +131,7 @@ class ExceptionHandler extends BaseExceptionHandler
                 $msg = 'Whoops, looks like something went wrong.';
         }
 
-        return response()->json([
+        return new Response([
             'errorMsg' => $msg,
         ], $status_code);
     }
